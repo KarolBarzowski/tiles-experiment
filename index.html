@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tiles experiment</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        color: rgba(255, 255, 255, 0.87);
+      }
+
+      #app {
+        background-color: rgb(28, 28, 30);
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .row {
+        display: flex;
+        flex-flow: row nowrap;
+        gap: 10px;
+      }
+
+      @keyframes appear {
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
+      }
+
+      .cube {
+        height: 64px;
+        width: 64px;
+        background-color: rgb(242, 242, 247);
+        border-radius: 10px;
+        opacity: 0;
+        transition: all 1s ease-in-out;
+        animation: appear 1s ease-in-out forwards;
+      }
+
+      .round {
+        border-radius: 50%;
+      }
+
+      .hide {
+        opacity: 0;
+      }
+
+      .rotate {
+        transform: rotate(360deg);
+      }
+
+      .red {
+        background-color: rgb(255, 69, 58);
+      }
+
+      .orange {
+        background-color: rgb(255, 159, 10);
+      }
+
+      .yellow {
+        background-color: rgb(255, 214, 10);
+      }
+
+      .green {
+        background-color: rgb(48, 209, 88);
+      }
+
+      .blue {
+        background-color: rgb(10, 132, 255);
+      }
+
+      .purple {
+        background-color: rgb(191, 90, 242);
+      }
+
+      .pink {
+        background-color: rgb(255, 55, 95);
+      }
+
+      .brown {
+        background-color: rgb(172, 142, 104);
+      }
+
+      .left {
+        transform: translateX(calc(-100% - 10px));
+      }
+
+      .right {
+        transform: translateX(calc(100% + 10px));
+      }
+
+      .up {
+        transform: translateY(calc(-100% - 10px));
+      }
+
+      .down {
+        transform: translateY(calc(100% + 10px));
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      let ROWS = 5;
+      let COLS = 8;
+
+      const app = document.querySelector("#app");
+
+      let interval;
+
+      function round(cube) {
+        cube.classList.add("round");
+
+        setTimeout(() => {
+          cube.classList.remove("round");
+        }, Math.random() * 5000);
+      }
+
+      function rotate(cube) {
+        cube.classList.add("rotate");
+
+        setTimeout(() => {
+          cube.classList.remove("rotate");
+        }, Math.random() * 5000);
+      }
+
+      function hide(cube) {
+        cube.classList.add("hide");
+
+        setTimeout(() => {
+          cube.classList.remove("hide");
+        }, Math.random() * 5000);
+      }
+
+      function color(cube) {
+        const colors = ["red", "orange", "yellow", "green", "blue", "purple", "pink", "brown"];
+        const colorRng = Math.floor(Math.random() * colors.length);
+        cube.classList.add(colors[colorRng]);
+
+        setTimeout(() => {
+          cube.classList.remove(colors[colorRng]);
+        }, Math.random() * 5000);
+      }
+
+      function move(cube) {
+        const directions = ["left", "right", "top", "down"];
+        let directionRng = Math.floor(Math.random() * directions.length);
+
+        while (cube.classList.contains(`edge${directions[directionRng]}`)) {
+          directionRng = Math.floor(Math.random() * directions.length);
+        }
+
+        cube.classList.add(directions[directionRng]);
+
+        setTimeout(() => {
+          cube.classList.remove(directions[directionRng]);
+        }, Math.random() * 5000);
+      }
+
+      function experiment() {
+        const cubeRng = Math.ceil(Math.random() * (COLS * ROWS - 1) + 1);
+        const randomFunctions = ["round", "rotate", "hide", "color", "move"];
+        const funcRng = Math.floor(Math.random() * randomFunctions.length);
+        const cube = document.querySelector(`#cube${cubeRng}`);
+
+        eval(`${randomFunctions[funcRng]}(cube)`);
+      }
+
+      function init() {
+        for (let rowIndex = 0; rowIndex < ROWS; rowIndex++) {
+          const row = document.createElement("div");
+          row.classList.add("row");
+          for (let colIndex = 0; colIndex < COLS; colIndex++) {
+            const el = document.createElement("div");
+            const id = colIndex + 1 + rowIndex * COLS;
+            el.classList.add("cube");
+            el.setAttribute("id", `cube${id}`);
+            el.style.animationDelay = `${id * 0.05}s`;
+            row.appendChild(el);
+
+            if (rowIndex === 0) el.classList.add("edgeup");
+            if (rowIndex === ROWS - 1) el.classList.add("edgedown");
+            if ((rowIndex + 1) * (colIndex + 1) === id) el.classList.add("edgeright");
+            if (rowIndex * COLS + 1 === id) el.classList.add("edgeleft");
+          }
+          app.appendChild(row);
+        }
+
+        setTimeout(() => {
+          interval = setInterval(() => {
+            experiment();
+            experiment();
+            experiment();
+          }, 800);
+        }, ROWS * COLS * 10);
+      }
+
+      init();
+    </script>
+  </body>
+</html>
